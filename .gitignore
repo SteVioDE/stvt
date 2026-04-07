@@ -1,0 +1,8 @@
+zig-out/
+zig-cache/
+.zig-cache/
+.devbox/
+.direnv/
+.DS_Store
+vendor/
+.claude/
