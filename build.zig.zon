@@ -1,14 +1,13 @@
 .{
     .name = .stvt,
-    .version = "0.0.0",
+    .version = "0.1.0",
     .fingerprint = 0x253b7bb73ddbd441,
     .minimum_zig_version = "0.15.2",
-    .dependencies = .{
-        .ghostty = .{ .path = "vendor/ghostty" },
-    },
+    .dependencies = .{},
     .paths = .{
         "build.zig",
         "build.zig.zon",
         "src",
+        "lib",
     },
 }

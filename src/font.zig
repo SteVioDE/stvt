@@ -1,5 +1,4 @@
 const std = @import("std");
-const c = @import("sdl.zig").c;
 const shim = @cImport({
     @cInclude("font_shim.h");
 });
@@ -42,12 +41,20 @@ const ATLAS_COL_GAP: u32 = 1;
 const MAX_GLYPH_STACK_BYTES: usize = 262_144; // 256 * 256 * 4
 
 pub const FontAtlas = struct {
-    // Atlas texture state
-    texture: *c.SDL_Texture,
+    // Atlas pixel buffer (BGRA8888, Metal-native format)
+    pixels: []u8,
     atlas_size: u32,
     cursor_x: u32,
     cursor_y: u32,
     row_height: u32,
+
+    // Track whether atlas has changed since last texture upload
+    dirty: bool,
+    // Region that needs re-uploading (min bounding rect of changes)
+    dirty_min_x: u32,
+    dirty_min_y: u32,
+    dirty_max_x: u32,
+    dirty_max_y: u32,
 
     // Glyph cache
     glyphs: std.AutoHashMap(GlyphKey, GlyphInfo),
@@ -58,13 +65,10 @@ pub const FontAtlas = struct {
     // Cell metrics from the regular font
     metrics: CellMetrics,
 
-    // SDL renderer reference (for texture operations)
-    sdl_renderer: *c.SDL_Renderer,
-
-    // Allocator for dynamic buffer when glyphs exceed stack buffer
+    // Allocator
     allocator: std.mem.Allocator,
 
-    pub fn init(allocator: std.mem.Allocator, sdl_renderer: *c.SDL_Renderer, font_name: [:0]const u8, size: f32, content_scale: f32) !FontAtlas {
+    pub fn init(allocator: std.mem.Allocator, font_name: [:0]const u8, size: f32, content_scale: f32) !FontAtlas {
         // Scale font size for HiDPI: rasterize at physical pixel size
         const scaled_size = size * content_scale;
 
@@ -81,33 +85,22 @@ pub const FontAtlas = struct {
         // Get cell metrics from regular font
         const m = shim.font_get_metrics(handles[0]);
 
-        // Create atlas texture: RGBA with blend mode
-        const texture = c.SDL_CreateTexture(
-            sdl_renderer,
-            c.SDL_PIXELFORMAT_ARGB8888,
-            c.SDL_TEXTUREACCESS_STREAMING,
-            @intCast(INITIAL_ATLAS_SIZE),
-            @intCast(INITIAL_ATLAS_SIZE),
-        ) orelse return error.TextureCreateFailed;
-
-        _ = c.SDL_SetTextureBlendMode(texture, c.SDL_BLENDMODE_BLEND);
-
-        // Clear texture to transparent
-        var pixels: ?*anyopaque = null;
-        var pitch: c_int = 0;
-        if (c.SDL_LockTexture(texture, null, &pixels, &pitch)) {
-            const pixel_data: [*]u8 = @ptrCast(pixels.?);
-            const total_bytes: usize = @intCast(pitch * @as(c_int, @intCast(INITIAL_ATLAS_SIZE)));
-            @memset(pixel_data[0..total_bytes], 0);
-            c.SDL_UnlockTexture(texture);
-        }
+        // Allocate atlas pixel buffer (BGRA8888)
+        const pixel_count = @as(usize, INITIAL_ATLAS_SIZE) * @as(usize, INITIAL_ATLAS_SIZE) * 4;
+        const pixels = try allocator.alloc(u8, pixel_count);
+        @memset(pixels, 0);
 
         return .{
-            .texture = texture,
+            .pixels = pixels,
             .atlas_size = INITIAL_ATLAS_SIZE,
             .cursor_x = 0,
             .cursor_y = 0,
             .row_height = 0,
+            .dirty = false,
+            .dirty_min_x = 0,
+            .dirty_min_y = 0,
+            .dirty_max_x = 0,
+            .dirty_max_y = 0,
             .glyphs = std.AutoHashMap(GlyphKey, GlyphInfo).init(allocator),
             .font_handles = handles,
             .metrics = .{
@@ -116,7 +109,6 @@ pub const FontAtlas = struct {
                 .ascent = @intCast(m.ascent),
                 .descent = @intCast(m.descent),
             },
-            .sdl_renderer = sdl_renderer,
             .allocator = allocator,
         };
     }
@@ -125,7 +117,7 @@ pub const FontAtlas = struct {
         for (&self.font_handles) |h| {
             if (h) |handle| shim.font_deinit(handle);
         }
-        c.SDL_DestroyTexture(self.texture);
+        self.allocator.free(self.pixels);
         self.glyphs.deinit();
     }
 
@@ -140,7 +132,6 @@ pub const FontAtlas = struct {
         }
         if (self.cursor_y + h > self.atlas_size) {
             if (!self.growAtlas()) return null;
-            // After growing, the current position is still valid — retry
             if (self.cursor_y + h > self.atlas_size) return null;
         }
         const result = PackResult{ .x = self.cursor_x, .y = self.cursor_y };
@@ -149,8 +140,7 @@ pub const FontAtlas = struct {
         return result;
     }
 
-    /// Double the atlas texture size, copying existing content to the new texture.
-    /// Returns true on success, false if at MAX_ATLAS_SIZE or texture creation fails.
+    /// Double the atlas size, copying existing content.
     fn growAtlas(self: *FontAtlas) bool {
         const new_size = self.atlas_size * 2;
         if (new_size > MAX_ATLAS_SIZE) {
@@ -158,56 +148,32 @@ pub const FontAtlas = struct {
             return false;
         }
 
-        // Create new larger texture
-        const new_texture = c.SDL_CreateTexture(
-            self.sdl_renderer,
-            c.SDL_PIXELFORMAT_ARGB8888,
-            c.SDL_TEXTUREACCESS_STREAMING,
-            @intCast(new_size),
-            @intCast(new_size),
-        ) orelse {
-            log.err("failed to create {d}x{d} atlas texture", .{ new_size, new_size });
+        const new_pixel_count = @as(usize, new_size) * @as(usize, new_size) * 4;
+        const new_pixels = self.allocator.alloc(u8, new_pixel_count) catch {
+            log.err("failed to allocate {d}x{d} atlas", .{ new_size, new_size });
             return false;
         };
+        @memset(new_pixels, 0);
 
-        _ = c.SDL_SetTextureBlendMode(new_texture, c.SDL_BLENDMODE_BLEND);
-
-        // Clear new texture to transparent, then copy old content — single lock
-        var new_pixels: ?*anyopaque = null;
-        var new_pitch: c_int = 0;
-        if (c.SDL_LockTexture(new_texture, null, &new_pixels, &new_pitch)) {
-            const dst: [*]u8 = @ptrCast(new_pixels.?);
-            const total_bytes: usize = @intCast(new_pitch * @as(c_int, @intCast(new_size)));
-            @memset(dst[0..total_bytes], 0);
-
-            // Copy old texture content row by row
-            var old_pixels: ?*anyopaque = null;
-            var old_pitch: c_int = 0;
-            const old_rect = c.SDL_Rect{ .x = 0, .y = 0, .w = @intCast(self.atlas_size), .h = @intCast(self.atlas_size) };
-
-            if (c.SDL_LockTexture(self.texture, &old_rect, &old_pixels, &old_pitch)) {
-                const src: [*]const u8 = @ptrCast(old_pixels.?);
-                const row_bytes: usize = @intCast(self.atlas_size * 4);
-
-                for (0..self.atlas_size) |row| {
-                    const src_offset = row * @as(usize, @intCast(old_pitch));
-                    const dst_offset = row * @as(usize, @intCast(new_pitch));
-                    @memcpy(dst[dst_offset..][0..row_bytes], src[src_offset..][0..row_bytes]);
-                }
-
-                c.SDL_UnlockTexture(self.texture);
-            } else {
-                log.warn("failed to lock old atlas during resize, content lost", .{});
-            }
-
-            c.SDL_UnlockTexture(new_texture);
-        } else {
-            log.warn("failed to lock new atlas during resize", .{});
+        // Copy old content row by row
+        const old_stride = @as(usize, self.atlas_size) * 4;
+        const new_stride = @as(usize, new_size) * 4;
+        for (0..self.atlas_size) |row| {
+            const src_offset = row * old_stride;
+            const dst_offset = row * new_stride;
+            @memcpy(new_pixels[dst_offset..][0..old_stride], self.pixels[src_offset..][0..old_stride]);
         }
 
-        c.SDL_DestroyTexture(self.texture);
-        self.texture = new_texture;
+        self.allocator.free(self.pixels);
+        self.pixels = new_pixels;
         self.atlas_size = new_size;
+
+        // Mark entire atlas dirty for re-upload
+        self.dirty = true;
+        self.dirty_min_x = 0;
+        self.dirty_min_y = 0;
+        self.dirty_max_x = new_size;
+        self.dirty_max_y = new_size;
 
         log.info("atlas grown to {d}x{d}", .{ new_size, new_size });
         return true;
@@ -229,7 +195,6 @@ pub const FontAtlas = struct {
         defer if (bmp.bitmap) |b| std.c.free(b);
 
         if (bmp.width <= 0 or bmp.height <= 0) {
-            // Whitespace or zero-size glyph — cache with zero dimensions
             const info = GlyphInfo{
                 .atlas_x = 0,
                 .atlas_y = 0,
@@ -249,35 +214,33 @@ pub const FontAtlas = struct {
         // Pack into atlas
         const pos = self.pack(w, h) orelse return null;
 
-        // Convert alpha-only bitmap to ARGB8888: white (0xFFFFFF) with alpha from bitmap
-        const pixel_count = w * h;
-        const argb_size = pixel_count * 4;
-
-        // Use stack buffer for typical glyphs, heap for large ones
-        var stack_buf: [MAX_GLYPH_STACK_BYTES]u8 = undefined;
-        const argb_buf = if (argb_size <= stack_buf.len)
-            stack_buf[0..argb_size]
-        else
-            self.allocator.alloc(u8, argb_size) catch return null;
-        defer if (argb_size > stack_buf.len) self.allocator.free(argb_buf);
-
+        // Convert alpha-only bitmap to BGRA8888 (Metal native: B, G, R, A in little-endian)
         const src: [*]const u8 = bmp.bitmap orelse return null;
-        for (0..pixel_count) |i| {
-            const alpha = src[i];
-            // ARGB8888: [B, G, R, A] in little-endian memory
-            argb_buf[i * 4 + 0] = 255; // B
-            argb_buf[i * 4 + 1] = 255; // G
-            argb_buf[i * 4 + 2] = 255; // R
-            argb_buf[i * 4 + 3] = alpha; // A
+        const stride = @as(usize, self.atlas_size) * 4;
+        for (0..h) |row| {
+            for (0..w) |col| {
+                const alpha = src[row * w + col];
+                const px_offset = (pos.y + @as(u32, @intCast(row))) * stride + (pos.x + @as(u32, @intCast(col))) * 4;
+                self.pixels[px_offset + 0] = 255; // B
+                self.pixels[px_offset + 1] = 255; // G
+                self.pixels[px_offset + 2] = 255; // R
+                self.pixels[px_offset + 3] = alpha; // A
+            }
         }
 
-        const dst_rect = c.SDL_Rect{
-            .x = @intCast(pos.x),
-            .y = @intCast(pos.y),
-            .w = @intCast(w),
-            .h = @intCast(h),
-        };
-        _ = c.SDL_UpdateTexture(self.texture, &dst_rect, argb_buf.ptr, @intCast(w * 4));
+        // Track dirty region
+        if (!self.dirty) {
+            self.dirty_min_x = pos.x;
+            self.dirty_min_y = pos.y;
+            self.dirty_max_x = pos.x + w;
+            self.dirty_max_y = pos.y + h;
+        } else {
+            self.dirty_min_x = @min(self.dirty_min_x, pos.x);
+            self.dirty_min_y = @min(self.dirty_min_y, pos.y);
+            self.dirty_max_x = @max(self.dirty_max_x, pos.x + w);
+            self.dirty_max_y = @max(self.dirty_max_y, pos.y + h);
+        }
+        self.dirty = true;
 
         const info = GlyphInfo{
             .atlas_x = pos.x,
@@ -292,4 +255,8 @@ pub const FontAtlas = struct {
         return info;
     }
 
+    /// Clear dirty tracking after texture upload.
+    pub fn clearDirty(self: *FontAtlas) void {
+        self.dirty = false;
+    }
 };

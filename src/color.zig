@@ -1,5 +1,3 @@
-const ghostty = @import("ghostty");
-
 pub const RGB = struct {
     r: u8,
     g: u8,
@@ -72,11 +70,3 @@ fn init_palette() [256]RGB {
     return pal;
 }
 
-/// Resolve a ghostty style color to an RGB value.
-pub fn resolveColor(clr: ghostty.Style.Color, fallback: RGB) RGB {
-    return switch (clr) {
-        .none => fallback,
-        .palette => |idx| palette_256[idx],
-        .rgb => |r| RGB{ .r = r.r, .g = r.g, .b = r.b },
-    };
-}

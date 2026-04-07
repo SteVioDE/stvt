@@ -1,16 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.1/.schema/devbox.schema.json",
   "packages": [
-    "sdl3@latest",
     "zig@latest"
   ],
   "shell": {
     "init_hook": [
-      "SDL3_DRV=$(nix-store -q --deriver $(readlink -f .devbox/nix/profile/default/lib/libSDL3.dylib) 2>/dev/null)",
-      "SDL3_DEV=$(nix-store -q --outputs \"$SDL3_DRV\" 2>/dev/null | grep -- '-dev$')",
-      "nix-store --add-root .devbox/sdl3-dev-gc-root --indirect -r \"$SDL3_DEV\" 2>/dev/null || true",
-      "export SDL3_INCLUDE_PATH=\"${SDL3_DEV}/include\"",
-      "export SDL3_LIB_PATH=\"$(dirname $(readlink -f .devbox/nix/profile/default/lib/libSDL3.dylib))\"",
       "unset NIX_CFLAGS_COMPILE",
       "unset NIX_LDFLAGS"
     ],
