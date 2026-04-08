@@ -3,8 +3,6 @@ const g = @import("ghostty.zig").c;
 
 /// Result of translating a macOS key event into a terminal action.
 pub const Action = union(enum) {
-    /// Bytes to write to the PTY (escape sequence or raw character).
-    write: []const u8,
     /// Cmd+V: paste system clipboard into terminal.
     paste,
     /// Cmd+Up: scroll viewport up by half a page.

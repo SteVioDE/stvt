@@ -44,6 +44,14 @@ const uint8_t* stvt_get_atlas_pixels(StvtContext ctx);
 uint32_t stvt_get_atlas_size(StvtContext ctx);
 bool stvt_is_atlas_dirty(StvtContext ctx);
 void stvt_clear_atlas_dirty(StvtContext ctx);
+
+typedef struct {
+    uint32_t min_x;
+    uint32_t min_y;
+    uint32_t max_x;
+    uint32_t max_y;
+} StvtAtlasDirtyRegion;
+StvtAtlasDirtyRegion stvt_get_atlas_dirty_region(StvtContext ctx);
 uint32_t stvt_get_cell_width(StvtContext ctx);
 uint32_t stvt_get_cell_height(StvtContext ctx);
 uint32_t stvt_get_ascent(StvtContext ctx);
@@ -81,12 +89,17 @@ bool stvt_title_changed(StvtContext ctx);
 // PTY fd (for dispatch_source)
 int32_t stvt_get_pty_fd(StvtContext ctx);
 
+// Scrollback
+void stvt_scroll_viewport(StvtContext ctx, int32_t delta);
+
 // Mouse
 // action: 0=press, 1=release, 2=motion
 // button: 0=unknown, 1=left, 2=right, 3=middle, 4-5=scroll
 bool stvt_feed_mouse(StvtContext ctx, uint32_t action, uint32_t button,
                      uint32_t ns_mods, float x, float y);
 bool stvt_is_mouse_tracking(StvtContext ctx);
+bool stvt_is_decckm(StvtContext ctx);
+bool stvt_is_alt_screen(StvtContext ctx);
 
 // Selection (pixel coordinates in backing store space)
 void stvt_select_start(StvtContext ctx, float px_x, float px_y);

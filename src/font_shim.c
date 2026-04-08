@@ -94,22 +94,38 @@ GlyphBitmap font_rasterize(void *handle, uint32_t codepoint) {
     }
 
     CGGlyph glyphs[2];
+    CTFontRef render_font = font;
+    bool used_fallback = false;
+
     if (!CTFontGetGlyphsForCharacters(font, chars, glyphs, char_count)) {
-        return result;
+        // Primary font doesn't have this glyph — ask Core Text for a fallback
+        CFStringRef str = CFStringCreateWithCharacters(kCFAllocatorDefault, chars, char_count);
+        if (!str) return result;
+        CTFontRef fallback = CTFontCreateForString(font, str, CFRangeMake(0, CFStringGetLength(str)));
+        CFRelease(str);
+        if (!fallback) return result;
+
+        if (!CTFontGetGlyphsForCharacters(fallback, chars, glyphs, char_count)) {
+            CFRelease(fallback);
+            return result;
+        }
+        render_font = fallback;
+        used_fallback = true;
     }
 
     CGGlyph glyph = glyphs[0];
 
     CGRect bbox;
-    CTFontGetBoundingRectsForGlyphs(font, kCTFontOrientationHorizontal, &glyph, &bbox, 1);
+    CTFontGetBoundingRectsForGlyphs(render_font, kCTFontOrientationHorizontal, &glyph, &bbox, 1);
     CGSize advance_size;
-    CTFontGetAdvancesForGlyphs(font, kCTFontOrientationHorizontal, &glyph, &advance_size, 1);
+    CTFontGetAdvancesForGlyphs(render_font, kCTFontOrientationHorizontal, &glyph, &advance_size, 1);
 
     int bmp_width = (int)ceil(bbox.size.width);
     int bmp_height = (int)ceil(bbox.size.height);
 
     if (bmp_width <= 0 || bmp_height <= 0) {
         result.advance = (int)ceil(advance_size.width);
+        if (used_fallback) CFRelease(render_font);
         return result;
     }
 
@@ -145,9 +161,10 @@ GlyphBitmap font_rasterize(void *handle, uint32_t codepoint) {
 
     CGPoint position = CGPointMake(-bbox.origin.x, -bbox.origin.y);
 
-    CTFontDrawGlyphs(font, &glyph, &position, 1, ctx);
+    CTFontDrawGlyphs(render_font, &glyph, &position, 1, ctx);
 
     CGContextRelease(ctx);
+    if (used_fallback) CFRelease(render_font);
 
     result.bitmap = bitmap;
     result.width = bmp_width;

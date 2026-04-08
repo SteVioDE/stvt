@@ -72,12 +72,12 @@ pub const Pty = struct {
     }
 
     /// Notify the child process of a terminal resize via TIOCSWINSZ ioctl.
-    pub fn notifyResize(self: *Pty, cols: u16, rows: u16) !void {
+    pub fn notifyResize(self: *Pty, cols: u16, rows: u16, pw: u16, ph: u16) !void {
         var ws: c.struct_winsize = .{
             .ws_col = cols,
             .ws_row = rows,
-            .ws_xpixel = 0,
-            .ws_ypixel = 0,
+            .ws_xpixel = pw,
+            .ws_ypixel = ph,
         };
         const ret = c.ioctl(self.master_fd, c.TIOCSWINSZ, &ws);
         if (ret < 0) return error.IoctlFailed;
@@ -102,11 +102,33 @@ fn childExec() noreturn {
     _ = c.setenv("TERM", DEFAULT_TERM, 1);
     _ = c.setenv("COLORTERM", DEFAULT_COLORTERM, 1);
 
+    // Ensure UTF-8 locale — .app bundles launched from Finder/Spotlight
+    // often lack LANG, defaulting to "C" locale. Programs like tmux/ncurses
+    // check LANG to decide UTF-8 support; without it they replace Unicode
+    // characters with ASCII fallbacks (typically '_').
+    if (c.getenv("LANG") == null) {
+        _ = c.setenv("LANG", "en_US.UTF-8", 0);
+    }
+
+    // Change to user's home directory (app bundles start at /)
+    const home = c.getenv("HOME");
+    if (home != null) {
+        _ = c.chdir(home);
+    }
+
     // Get the user's shell
     const shell: [*:0]const u8 = c.getenv("SHELL") orelse FALLBACK_SHELL;
 
-    // Exec the shell as a login shell
-    const argv = [_:null]?[*:0]const u8{ shell, null };
+    // Build login shell argv[0]: "-zsh" from "/bin/zsh"
+    // Shells check if argv[0] starts with '-' to enable login mode
+    var login_name: [256:0]u8 = undefined;
+    login_name[0] = '-';
+    const shell_span = std.mem.span(shell);
+    const base = if (std.mem.lastIndexOfScalar(u8, shell_span, '/')) |i| shell_span[i + 1 ..] else shell_span;
+    @memcpy(login_name[1 .. 1 + base.len], base);
+    login_name[1 + base.len] = 0;
+
+    const argv = [_:null]?[*:0]const u8{ &login_name, null };
     _ = c.execvp(shell, @ptrCast(&argv));
 
     // If exec failed, exit

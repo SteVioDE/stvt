@@ -316,6 +316,12 @@ pub const TerminalState = struct {
         var written: usize = 0;
         const result = g.ghostty_key_encoder_encode(self.key_encoder, self.key_event, out_buf.ptr, out_buf.len, &written);
         if (result != g.GHOSTTY_SUCCESS) return 0;
+
+        // Debug: log DECCKM state for arrow keys to verify application cursor mode
+        if (written > 0 and key >= g.GHOSTTY_KEY_ARROW_DOWN and key <= g.GHOSTTY_KEY_ARROW_UP) {
+            log.debug("arrow key: DECCKM={}, encoded={x}", .{ self.isDecckm(), out_buf[0..written] });
+        }
+
         return written;
     }
 
@@ -368,6 +374,36 @@ pub const TerminalState = struct {
         return tracking;
     }
 
+    /// Pack a GhosttyMode value in Zig. ghostty_mode_new is a static inline C
+    /// function which Zig's @cImport cannot link — reimplement the bit-packing.
+    /// DEC private mode (ansi=false): value & 0x7FFF. ANSI mode: value | 0x8000.
+    fn modeNew(value: u16, ansi: bool) g.GhosttyMode {
+        return (value & 0x7FFF) | (@as(u16, @intFromBool(ansi)) << 15);
+    }
+
+    fn isModeSet(self: *TerminalState, mode: g.GhosttyMode) bool {
+        var mode_set: bool = false;
+        _ = g.ghostty_terminal_mode_get(self.terminal, mode, &mode_set);
+        return mode_set;
+    }
+
+    /// Check if DECCKM (application cursor mode) is set.
+    pub fn isDecckm(self: *TerminalState) bool {
+        return self.isModeSet(modeNew(1, false));
+    }
+
+    /// Check if alternate screen is active (mode 1049, 1047, or 47).
+    pub fn isAltScreen(self: *TerminalState) bool {
+        return self.isModeSet(modeNew(1049, false)) or
+            self.isModeSet(modeNew(1047, false)) or
+            self.isModeSet(modeNew(47, false));
+    }
+
+    /// Check if bracketed paste mode is active (mode 2004).
+    pub fn isBracketedPaste(self: *TerminalState) bool {
+        return self.isModeSet(modeNew(2004, false));
+    }
+
     fn getCellWidth(self: *TerminalState) u32 {
         // We don't store cell dimensions directly — get from render state
         // This is used only for mouse encoding size context
@@ -407,8 +443,7 @@ fn writePtyCallback(_: g.GhosttyTerminal, _: ?*anyopaque, data: [*c]const u8, le
     if (write_pty_fd < 0) return;
     if (data == null or len == 0) return;
     _ = posix.write(write_pty_fd, data[0..len]) catch |err| {
-        const err_log = std.log.scoped(.terminal);
-        err_log.warn("pty write callback failed: {}", .{err});
+        log.warn("pty write callback failed: {}", .{err});
     };
 }
 

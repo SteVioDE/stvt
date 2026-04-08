@@ -38,7 +38,6 @@ const INITIAL_ATLAS_SIZE: u32 = 1024;
 const MAX_ATLAS_SIZE: u32 = 4096;
 const ATLAS_ROW_GAP: u32 = 1;
 const ATLAS_COL_GAP: u32 = 1;
-const MAX_GLYPH_STACK_BYTES: usize = 262_144; // 256 * 256 * 4
 
 pub const FontAtlas = struct {
     // Atlas pixel buffer (BGRA8888, Metal-native format)

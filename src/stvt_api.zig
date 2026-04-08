@@ -164,7 +164,6 @@ export fn stvt_feed_key(ctx: ?*StvtContext, keycode: u16, ns_mods: u32, utf8: ?[
         },
         .quit => return 4,
         .none => {},
-        .write => unreachable,
     }
 
     // Encode key to VT sequence via ghostty key encoder
@@ -227,14 +226,76 @@ export fn stvt_feed_text(ctx: ?*StvtContext, text: ?[*]const u8, len: usize) cal
     };
 }
 
-/// Paste text to PTY.
+/// Paste text to PTY with bracketed paste encoding.
+/// When len=0 and bracketed paste is active, sends empty bracket markers
+/// so the application can detect the paste event (e.g. for image clipboard).
 export fn stvt_paste(ctx: ?*StvtContext, text: ?[*]const u8, len: usize) callconv(.c) void {
     const c = ctx orelse return;
-    if (text == null or len == 0) return;
     c.term.scrollViewportBottom();
-    c.pty.write(text.?[0..len]) catch |err| {
-        log.warn("pty write failed (paste): {}", .{err});
+
+    const bracketed = c.term.isBracketedPaste();
+
+    // Empty paste: only useful in bracketed mode (signals paste event to app)
+    if (text == null or len == 0) {
+        if (bracketed) {
+            c.pty.write("\x1b[200~\x1b[201~") catch |err| {
+                log.warn("pty write failed (empty paste): {}", .{err});
+            };
+        }
+        return;
+    }
+
+    // ghostty_paste_encode modifies data in-place — make a mutable copy
+    const alloc = std.heap.c_allocator;
+    const data_copy = alloc.alloc(u8, len) catch {
+        log.warn("paste alloc failed", .{});
+        return;
     };
+    defer alloc.free(data_copy);
+    @memcpy(data_copy, text.?[0..len]);
+
+    // Output buffer: input + room for bracket sequences (~12 bytes)
+    const initial_size = len + 20;
+    var out_buf = alloc.alloc(u8, initial_size) catch {
+        log.warn("paste out alloc failed", .{});
+        return;
+    };
+
+    var written: usize = 0;
+    var result = g.ghostty_paste_encode(
+        @ptrCast(data_copy.ptr),
+        len,
+        bracketed,
+        @ptrCast(out_buf.ptr),
+        out_buf.len,
+        &written,
+    );
+
+    // Retry with larger buffer if needed
+    if (result == g.GHOSTTY_OUT_OF_SPACE) {
+        alloc.free(out_buf);
+        out_buf = alloc.alloc(u8, written) catch {
+            log.warn("paste realloc failed", .{});
+            return;
+        };
+        // Fresh copy since first call modified data_copy in place
+        @memcpy(data_copy, text.?[0..len]);
+        result = g.ghostty_paste_encode(
+            @ptrCast(data_copy.ptr),
+            len,
+            bracketed,
+            @ptrCast(out_buf.ptr),
+            out_buf.len,
+            &written,
+        );
+    }
+    defer alloc.free(out_buf);
+
+    if (result == g.GHOSTTY_SUCCESS and written > 0) {
+        c.pty.write(out_buf[0..written]) catch |err| {
+            log.warn("pty write failed (paste): {}", .{err});
+        };
+    }
 }
 
 // ─── Resize ──────────────────────────────────────────────────────
@@ -245,7 +306,9 @@ export fn stvt_resize(ctx: ?*StvtContext, new_cols: u16, new_rows: u16) callconv
     c.cols = new_cols;
     c.rows = new_rows;
     c.term.resize(new_cols, new_rows, c.atlas.metrics.cell_width, c.atlas.metrics.cell_height);
-    c.pty.notifyResize(new_cols, new_rows) catch |err| {
+    const pw: u16 = @intCast(@as(u32, new_cols) * c.atlas.metrics.cell_width);
+    const ph: u16 = @intCast(@as(u32, new_rows) * c.atlas.metrics.cell_height);
+    c.pty.notifyResize(new_cols, new_rows, pw, ph) catch |err| {
         log.warn("pty resize failed: {}", .{err});
     };
 }
@@ -290,6 +353,23 @@ export fn stvt_is_atlas_dirty(ctx: ?*StvtContext) callconv(.c) bool {
 export fn stvt_clear_atlas_dirty(ctx: ?*StvtContext) callconv(.c) void {
     const c = ctx orelse return;
     c.atlas.clearDirty();
+}
+
+const StvtAtlasDirtyRegion = extern struct {
+    min_x: u32,
+    min_y: u32,
+    max_x: u32,
+    max_y: u32,
+};
+
+export fn stvt_get_atlas_dirty_region(ctx: ?*StvtContext) callconv(.c) StvtAtlasDirtyRegion {
+    const c = ctx orelse return .{ .min_x = 0, .min_y = 0, .max_x = 0, .max_y = 0 };
+    return .{
+        .min_x = c.atlas.dirty_min_x,
+        .min_y = c.atlas.dirty_min_y,
+        .max_x = c.atlas.dirty_max_x,
+        .max_y = c.atlas.dirty_max_y,
+    };
 }
 
 export fn stvt_get_cell_width(ctx: ?*StvtContext) callconv(.c) u32 {
@@ -420,6 +500,14 @@ export fn stvt_get_pty_fd(ctx: ?*StvtContext) callconv(.c) i32 {
     return c.pty.master_fd;
 }
 
+// ─── Scrollback ────────────────────────────────────────────────
+
+/// Scroll viewport by delta rows (negative = up, positive = down).
+export fn stvt_scroll_viewport(ctx: ?*StvtContext, delta: i32) callconv(.c) void {
+    const c = ctx orelse return;
+    c.term.scrollViewportDelta(delta);
+}
+
 // ─── Mouse ──────────────────────────────────────────────────────
 
 /// Feed a mouse event. Returns true if data was written to PTY.
@@ -433,6 +521,18 @@ export fn stvt_feed_mouse(ctx: ?*StvtContext, action: u32, button: u32, ns_mods:
 export fn stvt_is_mouse_tracking(ctx: ?*StvtContext) callconv(.c) bool {
     const c = ctx orelse return false;
     return c.term.isMouseTracking();
+}
+
+/// Check if DECCKM (application cursor mode) is set.
+export fn stvt_is_decckm(ctx: ?*StvtContext) callconv(.c) bool {
+    const c = ctx orelse return false;
+    return c.term.isDecckm();
+}
+
+/// Check if alternate screen is active (tmux, vim, less, etc.).
+export fn stvt_is_alt_screen(ctx: ?*StvtContext) callconv(.c) bool {
+    const c = ctx orelse return false;
+    return c.term.isAltScreen();
 }
 
 // ─── Selection ──────────────────────────────────────────────────
