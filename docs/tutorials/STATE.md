@@ -2,8 +2,8 @@
 
 **Reference branch:** main
 **Tutorial branch:** tutorial
-**Project type:** Zig + Objective-C (macOS native terminal emulator)
-**Initialized:** 2026-04-08
+**Project type:** Zig + Objective-C + Metal (macOS)
+**Initialized:** 2026-04-09
 
 ## Write Log
 
