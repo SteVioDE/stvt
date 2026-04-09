@@ -6,6 +6,5 @@ zig-cache/
 .DS_Store
 vendor/
 .claude/
-docs/
 SPEC.md
 Claude.md
