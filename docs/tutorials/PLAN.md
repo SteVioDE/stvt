@@ -1,21 +1,20 @@
 # Tutorial: stvt — Build a Terminal Emulator from Scratch
 
-**Goal:** Build a minimal, GPU-accelerated macOS terminal emulator using Zig, Objective-C, and Metal
+**Goal:** Build a minimal, high-performance macOS terminal emulator using Zig + Objective-C with Metal GPU rendering and libghostty-vt for VT parsing.
 **Reference branch:** main
-**Language/Stack:** Zig + Objective-C + Metal + libghostty-vt
-**Created:** 2026-04-09
+**Language/Stack:** Zig 0.15 + Objective-C, AppKit, Metal, Core Text, libghostty-vt
+**Created:** 2026-04-10
 
 ## Chapters
 
-- [ ] 01 — Project Setup & Build: Initialize with zig init, configure build.zig, justfile, and devbox
-- [ ] 02 — PTY: Spawn a shell with forkpty, non-blocking read/write
-- [ ] 03 — VT Parser Integration: Link libghostty-vt, create ghostty.zig and terminal.zig
-- [ ] 04 — Color Palette: Build Gruvbox dark 256-color palette (color.zig)
-- [ ] 05 — Font Rasterization: Core Text C bridge (font_shim) and glyph atlas (font.zig)
-- [ ] 06 — C API Bridge: stvt_api.zig/h, main.zig with ~40 C-callable exports
-- [ ] 07 — Native Window: app.m with NSApplication, translucent window, CAMetalLayer
-- [ ] 08 — Metal Rendering: Shaders, pipeline states, triple-buffer, 3-pass rendering
-- [ ] 09 — Text Rendering: Wire glyph atlas to Metal, render terminal grid
-- [ ] 10 — Keyboard Input: input.zig key mapping, keyDown, NSTextInputClient
-- [ ] 11 — Mouse, Selection & Scrollback: Mouse tracking, text selection, scroll viewport
-- [ ] 12 — Polish & App Bundle: Paste, window title, resize, cursor styles, Info.plist, icon
+- [ ] 01 — Project Setup: Initialize the Zig project with devbox, justfile, and project scaffolding
+- [ ] 02 — Build System: Configure build.zig for dual compilation (Zig static lib + ObjC executable) with xcframework and macOS framework linking
+- [ ] 03 — PTY Management: Spawn a shell with forkpty, implement non-blocking I/O, resize, and child exit detection
+- [ ] 04 — Terminal Core: Integrate libghostty-vt via @cImport, wrap terminal state, VT parsing, and render state snapshots
+- [ ] 05 — Colors & Input: Define the Gruvbox 256-color palette and translate macOS keycodes to ghostty key/modifier mappings
+- [ ] 06 — Font Rendering: Build a Core Text C shim and Zig glyph atlas with on-demand rasterization and dirty region tracking
+- [ ] 07 — C API Bridge: Export ~40 Zig functions with C calling convention and create the public header for ObjC consumption
+- [ ] 08 — AppKit Window: Set up NSApplication, borderless window, Metal layer, visual effect blur, and HiDPI support
+- [ ] 09 — Metal Rendering: Implement inline shaders and the 3-pass GPU pipeline (backgrounds, glyphs, cursor/decorations)
+- [ ] 10 — Events & Interaction: Wire up keyboard, mouse, scroll, text input via NSTextInputClient, and dispatch_source PTY polling
+- [ ] 11 — Selection & App Bundle: Add text selection, clipboard, scrollback navigation, window title updates, and .app bundle packaging
