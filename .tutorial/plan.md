@@ -10,7 +10,7 @@
 - init_command: zig init
 
 ## Chapter 01: Project Skeleton & Build System
-- status: planned
+- status: active
 - languages: [zig]
 - learning_goals:
   - Initialize a Zig project and understand the package manifest
