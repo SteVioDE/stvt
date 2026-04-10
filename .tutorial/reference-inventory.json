@@ -1,0 +1,1794 @@
+{
+  "symbols": {
+    "DEFAULT_TERM": {
+      "name": "DEFAULT_TERM",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 11,
+      "depends_on": []
+    },
+    "DEFAULT_COLORTERM": {
+      "name": "DEFAULT_COLORTERM",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 12,
+      "depends_on": []
+    },
+    "FALLBACK_SHELL": {
+      "name": "FALLBACK_SHELL",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 13,
+      "depends_on": []
+    },
+    "Pty": {
+      "name": "Pty",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 15,
+      "depends_on": [
+        "childExec",
+        "pty.c",
+        "terminal.posix"
+      ]
+    },
+    "childExec": {
+      "name": "childExec",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 100,
+      "signature": "() noreturn",
+      "depends_on": []
+    },
+    "pty.posix": {
+      "name": "pty.posix",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 2,
+      "depends_on": []
+    },
+    "terminal.posix": {
+      "name": "terminal.posix",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 2,
+      "depends_on": []
+    },
+    "TerminalState": {
+      "name": "TerminalState",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 7,
+      "depends_on": [
+        "CursorInfo",
+        "log",
+        "mouse_cell_height",
+        "mouse_cell_width",
+        "terminal.posix",
+        "titleChangedCallback",
+        "writePtyCallback",
+        "write_pty_fd"
+      ]
+    },
+    "CursorInfo": {
+      "name": "CursorInfo",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 420,
+      "depends_on": []
+    },
+    "write_pty_fd": {
+      "name": "write_pty_fd",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 428,
+      "depends_on": [
+        "terminal.posix"
+      ]
+    },
+    "title_state": {
+      "name": "title_state",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 429,
+      "depends_on": [
+        "TerminalState"
+      ]
+    },
+    "mouse_cell_width": {
+      "name": "mouse_cell_width",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 430,
+      "depends_on": []
+    },
+    "mouse_cell_height": {
+      "name": "mouse_cell_height",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 431,
+      "depends_on": []
+    },
+    "setMouseCellSize": {
+      "name": "setMouseCellSize",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 433,
+      "signature": "(cw: u32, ch: u32) void",
+      "depends_on": []
+    },
+    "setTitleStatePtr": {
+      "name": "setTitleStatePtr",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 438,
+      "signature": "(state: *TerminalState) void",
+      "depends_on": [
+        "TerminalState"
+      ]
+    },
+    "writePtyCallback": {
+      "name": "writePtyCallback",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 442,
+      "signature": "(_: g.GhosttyTerminal, _: ?*anyopaque, data: [*c]const u8, len: usize) callconv(.c) void",
+      "depends_on": [
+        "pty.c"
+      ]
+    },
+    "titleChangedCallback": {
+      "name": "titleChangedCallback",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 450,
+      "signature": "(terminal: g.GhosttyTerminal, _: ?*anyopaque) callconv(.c) void",
+      "depends_on": [
+        "pty.c"
+      ]
+    },
+    "Action": {
+      "name": "Action",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/input.zig",
+      "line": 5,
+      "depends_on": []
+    },
+    "macVirtualKeyToGhosttyKey": {
+      "name": "macVirtualKeyToGhosttyKey",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/input.zig",
+      "line": 26,
+      "signature": "(keycode: u16) g.GhosttyKey",
+      "depends_on": []
+    },
+    "nsModsToGhosttyMods": {
+      "name": "nsModsToGhosttyMods",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/input.zig",
+      "line": 157,
+      "signature": "(ns_mods: u32) g.GhosttyMods",
+      "depends_on": []
+    },
+    "checkAppCommand": {
+      "name": "checkAppCommand",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/input.zig",
+      "line": 169,
+      "signature": "(key: g.GhosttyKey, mods: g.GhosttyMods) Action",
+      "depends_on": [
+        "Action"
+      ]
+    },
+    "terminal.log": {
+      "name": "terminal.log",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/terminal.zig",
+      "line": 5,
+      "depends_on": []
+    },
+    "font.log": {
+      "name": "font.log",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 6,
+      "depends_on": []
+    },
+    "Style": {
+      "name": "Style",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 8,
+      "depends_on": []
+    },
+    "GlyphKey": {
+      "name": "GlyphKey",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 15,
+      "depends_on": [
+        "Style"
+      ]
+    },
+    "GlyphInfo": {
+      "name": "GlyphInfo",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 20,
+      "depends_on": []
+    },
+    "CellMetrics": {
+      "name": "CellMetrics",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 30,
+      "depends_on": []
+    },
+    "INITIAL_ATLAS_SIZE": {
+      "name": "INITIAL_ATLAS_SIZE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 37,
+      "depends_on": []
+    },
+    "MAX_ATLAS_SIZE": {
+      "name": "MAX_ATLAS_SIZE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 38,
+      "depends_on": []
+    },
+    "ATLAS_ROW_GAP": {
+      "name": "ATLAS_ROW_GAP",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 39,
+      "depends_on": []
+    },
+    "ATLAS_COL_GAP": {
+      "name": "ATLAS_COL_GAP",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 40,
+      "depends_on": []
+    },
+    "FontAtlas": {
+      "name": "FontAtlas",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 42,
+      "depends_on": [
+        "ATLAS_COL_GAP",
+        "ATLAS_ROW_GAP",
+        "CellMetrics",
+        "GlyphInfo",
+        "GlyphKey",
+        "INITIAL_ATLAS_SIZE",
+        "MAX_ATLAS_SIZE",
+        "Style",
+        "font.shim",
+        "font_shim.font_deinit",
+        "font_shim.font_init_bold",
+        "log",
+        "pty.c",
+        "src.font_shim.h.font_get_metrics",
+        "src.font_shim.h.font_init",
+        "src.font_shim.h.font_init_bold_italic",
+        "src.font_shim.h.font_init_italic",
+        "src.font_shim.h.font_rasterize"
+      ]
+    },
+    "RGB": {
+      "name": "RGB",
+      "kind": "struct",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 1,
+      "depends_on": []
+    },
+    "default_fg": {
+      "name": "default_fg",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 8,
+      "depends_on": [
+        "RGB"
+      ]
+    },
+    "default_bg": {
+      "name": "default_bg",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 9,
+      "depends_on": [
+        "RGB"
+      ]
+    },
+    "BG_ALPHA": {
+      "name": "BG_ALPHA",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 10,
+      "depends_on": []
+    },
+    "palette_256": {
+      "name": "palette_256",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 17,
+      "depends_on": [
+        "RGB",
+        "init_palette"
+      ]
+    },
+    "CUBE_LEVELS": {
+      "name": "CUBE_LEVELS",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 20,
+      "depends_on": []
+    },
+    "CUBE_SIZE": {
+      "name": "CUBE_SIZE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 21,
+      "depends_on": []
+    },
+    "CUBE_PLANE": {
+      "name": "CUBE_PLANE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 22,
+      "depends_on": []
+    },
+    "CUBE_BASE": {
+      "name": "CUBE_BASE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 23,
+      "depends_on": []
+    },
+    "CUBE_STEP": {
+      "name": "CUBE_STEP",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 24,
+      "depends_on": []
+    },
+    "GRAY_RAMP_SIZE": {
+      "name": "GRAY_RAMP_SIZE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 25,
+      "depends_on": []
+    },
+    "GRAY_BASE": {
+      "name": "GRAY_BASE",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 26,
+      "depends_on": []
+    },
+    "GRAY_STEP": {
+      "name": "GRAY_STEP",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 27,
+      "depends_on": []
+    },
+    "init_palette": {
+      "name": "init_palette",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/color.zig",
+      "line": 29,
+      "signature": "() [256]RGB",
+      "depends_on": [
+        "RGB"
+      ]
+    },
+    "pty.c": {
+      "name": "pty.c",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/pty.zig",
+      "line": 4,
+      "depends_on": []
+    },
+    "ghostty.c": {
+      "name": "ghostty.c",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/ghostty.zig",
+      "line": 3,
+      "depends_on": []
+    },
+    "font.shim": {
+      "name": "font.shim",
+      "kind": "constant",
+      "visibility": "pub",
+      "file": "src/font.zig",
+      "line": 2,
+      "depends_on": []
+    },
+    "stvt_api.shim": {
+      "name": "stvt_api.shim",
+      "kind": "constant",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 8,
+      "depends_on": []
+    },
+    "log": {
+      "name": "log",
+      "kind": "constant",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 12,
+      "depends_on": []
+    },
+    "FONT_NAME": {
+      "name": "FONT_NAME",
+      "kind": "constant",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 16,
+      "depends_on": []
+    },
+    "FONT_SIZE": {
+      "name": "FONT_SIZE",
+      "kind": "constant",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 17,
+      "depends_on": []
+    },
+    "PTY_READ_BUF_SIZE": {
+      "name": "PTY_READ_BUF_SIZE",
+      "kind": "constant",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 18,
+      "depends_on": []
+    },
+    "stvt_init": {
+      "name": "stvt_init",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 45,
+      "signature": "(cols: u16, rows: u16, content_scale: f32) callconv(.c) ?*StvtContext",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_destroy": {
+      "name": "stvt_destroy",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 90,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_poll": {
+      "name": "stvt_poll",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 103,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) i32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_alive": {
+      "name": "stvt_is_alive",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 126,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_feed_key": {
+      "name": "stvt_feed_key",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 134,
+      "signature": "(ctx: ?*StvtContext, keycode: u16, ns_mods: u32, utf8: ?[*]const u8, utf8_len: usize) callconv(.c) i32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "vt220FKeySequence": {
+      "name": "vt220FKeySequence",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 205,
+      "signature": "(key: g.GhosttyKey) ?[]const u8",
+      "depends_on": []
+    },
+    "stvt_feed_text": {
+      "name": "stvt_feed_text",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 220,
+      "signature": "(ctx: ?*StvtContext, text: ?[*]const u8, len: usize) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_paste": {
+      "name": "stvt_paste",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 232,
+      "signature": "(ctx: ?*StvtContext, text: ?[*]const u8, len: usize) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_resize": {
+      "name": "stvt_resize",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 303,
+      "signature": "(ctx: ?*StvtContext, new_cols: u16, new_rows: u16) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_update_render_state": {
+      "name": "stvt_update_render_state",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 319,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) i32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_render_state": {
+      "name": "stvt_get_render_state",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 325,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) g.GhosttyRenderState",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_terminal": {
+      "name": "stvt_get_terminal",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 331,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) g.GhosttyTerminal",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_atlas_pixels": {
+      "name": "stvt_get_atlas_pixels",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 338,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) ?[*]const u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_atlas_size": {
+      "name": "stvt_get_atlas_size",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 343,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_atlas_dirty": {
+      "name": "stvt_is_atlas_dirty",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 348,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_clear_atlas_dirty": {
+      "name": "stvt_clear_atlas_dirty",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 353,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_atlas_dirty_region": {
+      "name": "stvt_get_atlas_dirty_region",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 365,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) StvtAtlasDirtyRegion",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtAtlasDirtyRegion",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_cell_width": {
+      "name": "stvt_get_cell_width",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 375,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_cell_height": {
+      "name": "stvt_get_cell_height",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 380,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_ascent": {
+      "name": "stvt_get_ascent",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 385,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_glyph": {
+      "name": "stvt_get_glyph",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 403,
+      "signature": "(ctx: ?*StvtContext, codepoint: u32, style: u8) callconv(.c) StvtGlyphInfo",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext",
+        "src.stvt_api.h.StvtGlyphInfo"
+      ]
+    },
+    "stvt_get_default_bg_r": {
+      "name": "stvt_get_default_bg_r",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 423,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_default_bg_g": {
+      "name": "stvt_get_default_bg_g",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 424,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_default_bg_b": {
+      "name": "stvt_get_default_bg_b",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 425,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_bg_alpha": {
+      "name": "stvt_get_bg_alpha",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 426,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_default_fg_r": {
+      "name": "stvt_get_default_fg_r",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 427,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_default_fg_g": {
+      "name": "stvt_get_default_fg_g",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 428,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_default_fg_b": {
+      "name": "stvt_get_default_fg_b",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 429,
+      "signature": "(_: ?*StvtContext) callconv(.c) u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_cols": {
+      "name": "stvt_get_cols",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 433,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u16",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_rows": {
+      "name": "stvt_get_rows",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 438,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) u16",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_clear_dirty": {
+      "name": "stvt_clear_dirty",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 444,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_dirty_rows": {
+      "name": "stvt_get_dirty_rows",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 450,
+      "signature": "(ctx: ?*StvtContext, out_min: ?*u16, out_max: ?*u16) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_title": {
+      "name": "stvt_get_title",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 478,
+      "signature": "(ctx: ?*StvtContext, out_len: ?*usize) callconv(.c) ?[*]const u8",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_title_changed": {
+      "name": "stvt_title_changed",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 486,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_get_pty_fd": {
+      "name": "stvt_get_pty_fd",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 498,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) i32",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_scroll_viewport": {
+      "name": "stvt_scroll_viewport",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 506,
+      "signature": "(ctx: ?*StvtContext, delta: i32) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_feed_mouse": {
+      "name": "stvt_feed_mouse",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 514,
+      "signature": "(ctx: ?*StvtContext, action: u32, button: u32, ns_mods: u32, x: f32, y: f32) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_mouse_tracking": {
+      "name": "stvt_is_mouse_tracking",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 521,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_decckm": {
+      "name": "stvt_is_decckm",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 527,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_alt_screen": {
+      "name": "stvt_is_alt_screen",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 533,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "pixelToGrid": {
+      "name": "pixelToGrid",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 540,
+      "signature": "(c: *StvtContext, px_x: f32, px_y: f32) struct { col: u16, row: u16 }",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "resolveGridRef": {
+      "name": "resolveGridRef",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 550,
+      "signature": "(c: *StvtContext, col: u16, row: u16) g.GhosttyGridRef",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_select_start": {
+      "name": "stvt_select_start",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 561,
+      "signature": "(ctx: ?*StvtContext, px_x: f32, px_y: f32) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_select_update": {
+      "name": "stvt_select_update",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 574,
+      "signature": "(ctx: ?*StvtContext, px_x: f32, px_y: f32) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_select_clear": {
+      "name": "stvt_select_clear",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 584,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) void",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_is_cell_selected": {
+      "name": "stvt_is_cell_selected",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 590,
+      "signature": "(ctx: ?*StvtContext, col: u16, row: u16) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_has_selection": {
+      "name": "stvt_has_selection",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 615,
+      "signature": "(ctx: ?*StvtContext) callconv(.c) bool",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "stvt_copy_selection": {
+      "name": "stvt_copy_selection",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 621,
+      "signature": "(ctx: ?*StvtContext, out_buf: ?[*]u8, buf_len: usize) callconv(.c) usize",
+      "depends_on": [
+        "pty.c",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "font_init_with_traits": {
+      "name": "font_init_with_traits",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/font_shim.c",
+      "line": 12,
+      "signature": "static void *font_init_with_traits(const char *font_name, float size, CTFontSymbolicTraits traits)",
+      "depends_on": []
+    },
+    "GlyphBitmap": {
+      "name": "GlyphBitmap",
+      "kind": "type_alias",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 7,
+      "depends_on": []
+    },
+    "FontMetrics": {
+      "name": "FontMetrics",
+      "kind": "type_alias",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 16,
+      "depends_on": []
+    },
+    "font_shim.font_init": {
+      "name": "font_shim.font_init",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 34,
+      "signature": "void *font_init(const char *font_name, float size)",
+      "depends_on": [
+        "font_init_with_traits"
+      ]
+    },
+    "src.font_shim.h.font_init": {
+      "name": "src.font_shim.h.font_init",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 23,
+      "signature": "void *font_init(const char *font_name, float size)",
+      "depends_on": []
+    },
+    "font_shim.font_init_bold": {
+      "name": "font_shim.font_init_bold",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 38,
+      "signature": "void *font_init_bold(const char *font_name, float size)",
+      "depends_on": [
+        "font_init_with_traits"
+      ]
+    },
+    "src.font_shim.h.font_init_bold": {
+      "name": "src.font_shim.h.font_init_bold",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 24,
+      "signature": "void *font_init_bold(const char *font_name, float size)",
+      "depends_on": []
+    },
+    "font_shim.font_init_italic": {
+      "name": "font_shim.font_init_italic",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 42,
+      "signature": "void *font_init_italic(const char *font_name, float size)",
+      "depends_on": [
+        "font_init_with_traits"
+      ]
+    },
+    "src.font_shim.h.font_init_italic": {
+      "name": "src.font_shim.h.font_init_italic",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 25,
+      "signature": "void *font_init_italic(const char *font_name, float size)",
+      "depends_on": []
+    },
+    "font_shim.font_init_bold_italic": {
+      "name": "font_shim.font_init_bold_italic",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 46,
+      "signature": "void *font_init_bold_italic(const char *font_name, float size)",
+      "depends_on": [
+        "font_init_with_traits"
+      ]
+    },
+    "src.font_shim.h.font_init_bold_italic": {
+      "name": "src.font_shim.h.font_init_bold_italic",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 26,
+      "signature": "void *font_init_bold_italic(const char *font_name, float size)",
+      "depends_on": []
+    },
+    "font_shim.font_deinit": {
+      "name": "font_shim.font_deinit",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 50,
+      "signature": "void font_deinit(void *handle)",
+      "depends_on": []
+    },
+    "src.font_shim.h.font_deinit": {
+      "name": "src.font_shim.h.font_deinit",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 27,
+      "signature": "void font_deinit(void *handle)",
+      "depends_on": []
+    },
+    "font_shim.font_get_metrics": {
+      "name": "font_shim.font_get_metrics",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 56,
+      "signature": "FontMetrics font_get_metrics(void *handle)",
+      "depends_on": [
+        "FontMetrics"
+      ]
+    },
+    "src.font_shim.h.font_get_metrics": {
+      "name": "src.font_shim.h.font_get_metrics",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 29,
+      "signature": "FontMetrics font_get_metrics(void *handle)",
+      "depends_on": [
+        "FontMetrics"
+      ]
+    },
+    "font_shim.font_rasterize": {
+      "name": "font_shim.font_rasterize",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.c",
+      "line": 80,
+      "signature": "GlyphBitmap font_rasterize(void *handle, uint32_t codepoint)",
+      "depends_on": [
+        "GlyphBitmap"
+      ]
+    },
+    "src.font_shim.h.font_rasterize": {
+      "name": "src.font_shim.h.font_rasterize",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/font_shim.h",
+      "line": 30,
+      "signature": "GlyphBitmap font_rasterize(void *handle, uint32_t codepoint)",
+      "depends_on": [
+        "GlyphBitmap"
+      ]
+    },
+    "stvt_api.StvtContext": {
+      "name": "stvt_api.StvtContext",
+      "kind": "struct",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 21,
+      "depends_on": [
+        "FontAtlas",
+        "PTY_READ_BUF_SIZE",
+        "Pty",
+        "TerminalState"
+      ]
+    },
+    "src.stvt_api.h.StvtContext": {
+      "name": "src.stvt_api.h.StvtContext",
+      "kind": "type_alias",
+      "visibility": "pub",
+      "file": "src/stvt_api.h",
+      "line": 14,
+      "depends_on": []
+    },
+    "stvt_api.StvtAtlasDirtyRegion": {
+      "name": "stvt_api.StvtAtlasDirtyRegion",
+      "kind": "struct",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 358,
+      "depends_on": []
+    },
+    "src.stvt_api.h.StvtAtlasDirtyRegion": {
+      "name": "src.stvt_api.h.StvtAtlasDirtyRegion",
+      "kind": "type_alias",
+      "visibility": "pub",
+      "file": "src/stvt_api.h",
+      "line": 48,
+      "depends_on": []
+    },
+    "stvt_api.StvtGlyphInfo": {
+      "name": "stvt_api.StvtGlyphInfo",
+      "kind": "struct",
+      "visibility": "private",
+      "file": "src/stvt_api.zig",
+      "line": 391,
+      "depends_on": []
+    },
+    "src.stvt_api.h.StvtGlyphInfo": {
+      "name": "src.stvt_api.h.StvtGlyphInfo",
+      "kind": "type_alias",
+      "visibility": "pub",
+      "file": "src/stvt_api.h",
+      "line": 59,
+      "depends_on": []
+    },
+    "vertex_main": {
+      "name": "vertex_main",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 37,
+      "signature": "vertex VertexOut vertex_main(uint vid [[vertex_id]],\n                             constant Vertex *vertices [[buffer(0)]],\n                             constant Uniforms &uniforms [[buffer(1)]])",
+      "depends_on": []
+    },
+    "fragment_color": {
+      "name": "fragment_color",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 50,
+      "signature": "fragment float4 fragment_color(VertexOut in [[stage_in]])",
+      "depends_on": []
+    },
+    "fragment_glyph": {
+      "name": "fragment_glyph",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 54,
+      "signature": "fragment float4 fragment_glyph(VertexOut in [[stage_in]],\n                               texture2d<float> atlas [[texture(0)]])",
+      "depends_on": []
+    },
+    "StvtWindow": {
+      "name": "StvtWindow",
+      "kind": "class",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 76,
+      "depends_on": []
+    },
+    "StvtWindow.canBecomeKeyWindow": {
+      "name": "StvtWindow.canBecomeKeyWindow",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 79,
+      "depends_on": []
+    },
+    "StvtWindow.canBecomeMainWindow": {
+      "name": "StvtWindow.canBecomeMainWindow",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 80,
+      "depends_on": []
+    },
+    "StvtAppDelegate": {
+      "name": "StvtAppDelegate",
+      "kind": "class",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 83,
+      "depends_on": [
+        "StvtView",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "StvtView": {
+      "name": "StvtView",
+      "kind": "class",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 93,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "StvtView.initWithFrame": {
+      "name": "StvtView.initWithFrame",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 131,
+      "depends_on": [
+        "StvtView.setupMetal",
+        "src.stvt_api.h.StvtContext"
+      ]
+    },
+    "StvtView.makeBackingLayer": {
+      "name": "StvtView.makeBackingLayer",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 142,
+      "depends_on": []
+    },
+    "StvtView.setupMetal": {
+      "name": "StvtView.setupMetal",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 146,
+      "depends_on": []
+    },
+    "StvtView.acceptsFirstResponder": {
+      "name": "StvtView.acceptsFirstResponder",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 222,
+      "depends_on": []
+    },
+    "StvtView.canBecomeKeyView": {
+      "name": "StvtView.canBecomeKeyView",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 223,
+      "depends_on": []
+    },
+    "StvtView.isFlipped": {
+      "name": "StvtView.isFlipped",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 224,
+      "depends_on": []
+    },
+    "StvtView.keyDown": {
+      "name": "StvtView.keyDown",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 228,
+      "depends_on": [
+        "StvtView.copySelectionToClipboard",
+        "StvtView.pasteFromClipboard",
+        "StvtView.renderMetal",
+        "stvt_feed_key",
+        "stvt_select_clear"
+      ]
+    },
+    "StvtView.pasteFromClipboard": {
+      "name": "StvtView.pasteFromClipboard",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 265,
+      "depends_on": [
+        "stvt_paste"
+      ]
+    },
+    "StvtView.insertText": {
+      "name": "StvtView.insertText",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 280,
+      "depends_on": [
+        "stvt_feed_text"
+      ]
+    },
+    "StvtView.setMarkedText": {
+      "name": "StvtView.setMarkedText",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 291,
+      "depends_on": [
+        "StvtView.selectedRange"
+      ]
+    },
+    "StvtView.unmarkText": {
+      "name": "StvtView.unmarkText",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 301,
+      "depends_on": []
+    },
+    "StvtView.selectedRange": {
+      "name": "StvtView.selectedRange",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 305,
+      "depends_on": []
+    },
+    "StvtView.markedRange": {
+      "name": "StvtView.markedRange",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 306,
+      "depends_on": []
+    },
+    "StvtView.hasMarkedText": {
+      "name": "StvtView.hasMarkedText",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 309,
+      "depends_on": []
+    },
+    "StvtView.attributedSubstringForProposedRange": {
+      "name": "StvtView.attributedSubstringForProposedRange",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 310,
+      "depends_on": []
+    },
+    "StvtView.validAttributesForMarkedText": {
+      "name": "StvtView.validAttributesForMarkedText",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 314,
+      "depends_on": []
+    },
+    "StvtView.firstRectForCharacterRange": {
+      "name": "StvtView.firstRectForCharacterRange",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 315,
+      "depends_on": []
+    },
+    "StvtView.characterIndexForPoint": {
+      "name": "StvtView.characterIndexForPoint",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 319,
+      "depends_on": []
+    },
+    "StvtView.doCommandBySelector": {
+      "name": "StvtView.doCommandBySelector",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 320,
+      "depends_on": []
+    },
+    "StvtView.mouseDown": {
+      "name": "StvtView.mouseDown",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 328,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse",
+        "stvt_is_mouse_tracking",
+        "stvt_select_clear",
+        "stvt_select_start"
+      ]
+    },
+    "StvtView.mouseUp": {
+      "name": "StvtView.mouseUp",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 347,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse",
+        "stvt_is_mouse_tracking"
+      ]
+    },
+    "StvtView.mouseDragged": {
+      "name": "StvtView.mouseDragged",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 361,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse",
+        "stvt_has_selection",
+        "stvt_is_mouse_tracking",
+        "stvt_select_update"
+      ]
+    },
+    "StvtView.rightMouseDown": {
+      "name": "StvtView.rightMouseDown",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 376,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse"
+      ]
+    },
+    "StvtView.rightMouseUp": {
+      "name": "StvtView.rightMouseUp",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 385,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse"
+      ]
+    },
+    "StvtView.scrollWheel": {
+      "name": "StvtView.scrollWheel",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 394,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_feed_mouse",
+        "stvt_feed_text",
+        "stvt_get_cell_height",
+        "stvt_is_alt_screen",
+        "stvt_is_decckm",
+        "stvt_is_mouse_tracking",
+        "stvt_scroll_viewport"
+      ]
+    },
+    "StvtView.copySelectionToClipboard": {
+      "name": "StvtView.copySelectionToClipboard",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 449,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_copy_selection",
+        "stvt_select_clear"
+      ]
+    },
+    "StvtView.emitQuad": {
+      "name": "StvtView.emitQuad",
+      "kind": "function",
+      "visibility": "private",
+      "file": "src/app.m",
+      "line": 467,
+      "signature": "static inline NSUInteger emitQuad(MetalVertex *verts, NSUInteger quadIdx,\n                                   float x, float y, float w, float h,\n                                   float u0, float v0, float u1, float v1,\n                                   float r, float g, float b, float a)",
+      "depends_on": []
+    },
+    "StvtView.updateAtlasTexture": {
+      "name": "StvtView.updateAtlasTexture",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 484,
+      "depends_on": [
+        "src.stvt_api.h.StvtAtlasDirtyRegion",
+        "stvt_clear_atlas_dirty",
+        "stvt_get_atlas_dirty_region",
+        "stvt_get_atlas_pixels",
+        "stvt_get_atlas_size",
+        "stvt_is_atlas_dirty"
+      ]
+    },
+    "StvtView.renderMetal": {
+      "name": "StvtView.renderMetal",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 531,
+      "depends_on": [
+        "StvtView.emitQuad",
+        "StvtView.updateAtlasTexture",
+        "src.stvt_api.h.StvtGlyphInfo",
+        "stvt_get_ascent",
+        "stvt_get_atlas_size",
+        "stvt_get_bg_alpha",
+        "stvt_get_cell_height",
+        "stvt_get_cell_width",
+        "stvt_get_cols",
+        "stvt_get_default_bg_b",
+        "stvt_get_default_bg_g",
+        "stvt_get_default_bg_r",
+        "stvt_get_glyph",
+        "stvt_get_render_state",
+        "stvt_get_rows",
+        "stvt_is_cell_selected",
+        "stvt_update_render_state"
+      ]
+    },
+    "StvtAppDelegate.applicationDidFinishLaunching": {
+      "name": "StvtAppDelegate.applicationDidFinishLaunching",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 862,
+      "depends_on": [
+        "StvtAppDelegate",
+        "StvtAppDelegate.doPoll",
+        "StvtView",
+        "StvtView.initWithFrame",
+        "StvtWindow",
+        "stvt_get_cell_height",
+        "stvt_get_cell_width",
+        "stvt_get_pty_fd",
+        "stvt_init"
+      ]
+    },
+    "StvtAppDelegate.doPoll": {
+      "name": "StvtAppDelegate.doPoll",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 971,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_get_title",
+        "stvt_poll",
+        "stvt_title_changed"
+      ]
+    },
+    "StvtAppDelegate.fallbackTick": {
+      "name": "StvtAppDelegate.fallbackTick",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 997,
+      "depends_on": [
+        "StvtAppDelegate.doPoll",
+        "stvt_is_alive"
+      ]
+    },
+    "StvtAppDelegate.windowDidResize": {
+      "name": "StvtAppDelegate.windowDidResize",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 1011,
+      "depends_on": [
+        "StvtView.renderMetal",
+        "stvt_get_cell_height",
+        "stvt_get_cell_width",
+        "stvt_resize"
+      ]
+    },
+    "StvtAppDelegate.applicationWillTerminate": {
+      "name": "StvtAppDelegate.applicationWillTerminate",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 1032,
+      "depends_on": [
+        "stvt_destroy"
+      ]
+    },
+    "StvtAppDelegate.applicationShouldTerminateAfterLastWindowClosed": {
+      "name": "StvtAppDelegate.applicationShouldTerminateAfterLastWindowClosed",
+      "kind": "method",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 1043,
+      "depends_on": []
+    },
+    "main": {
+      "name": "main",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "src/app.m",
+      "line": 1052,
+      "signature": "int main(int argc, const char *argv[])",
+      "depends_on": [
+        "StvtAppDelegate"
+      ]
+    },
+    "build": {
+      "name": "build",
+      "kind": "function",
+      "visibility": "pub",
+      "file": "build.zig",
+      "line": 3,
+      "signature": "(b: *std.Build) void",
+      "depends_on": []
+    }
+  },
+  "metadata": {
+    "extracted_at": "2026-04-10T22:46:25.785500+00:00",
+    "files_analyzed": [
+      "build.zig",
+      "build.zig.zon",
+      "src/app.m",
+      "src/color.zig",
+      "src/font.zig",
+      "src/font_shim.c",
+      "src/font_shim.h",
+      "src/ghostty.zig",
+      "src/input.zig",
+      "src/main.zig",
+      "src/pty.zig",
+      "src/stvt_api.h",
+      "src/stvt_api.zig",
+      "src/terminal.zig"
+    ],
+    "languages": [
+      "c",
+      "objc",
+      "zig"
+    ],
+    "tool_version": "1.0.0"
+  }
+}
